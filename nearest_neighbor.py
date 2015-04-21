@@ -33,11 +33,11 @@ def closest_pair_bf(points):
     number_of_points = len(points)
     if number_of_points <= 1:
         return -1
-    all_dist = [] # This is the list that will hold all combination of dist
+    smallest = float("inf")
     for point_indx in range(number_of_points):
         for compare_point_indx in range(point_indx+1, number_of_points):
-            all_dist.append(euclidean_dist(points[point_indx], points[compare_point_indx]))
-    return min(all_dist)
+            smallest = min(smallest, euclidean_dist(points[point_indx], points[compare_point_indx]))
+    return smallest
 
 def closest_pair_d_and_c(points):
     """
@@ -66,7 +66,7 @@ def graph(points):
     print "#>title,Closest Point"
     print "#>xAxis,Number of Points"
     print "#>yAxis,Time in Seconds"
-    for i in range(len(points)):
+    for i in xrange(0,len(points), 10):
         time1 = time.time()
         result1 = closest_pair_bf(points[:i])
         time2 = time.time()
@@ -79,12 +79,12 @@ def graph(points):
 
 
 def main(argv):
-    file_points = file_input("sets/input_10e5.txt")
+    file_points = file_input(argv[0])
     points = []
     for point in file_points:
         bisect.insort_right(points, (float(point[0]), float(point[1])))
-    graph(points)
-#print closest_pair_d_and_c(points)
+    #graph(points)
+    print closest_pair_bf(points)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
