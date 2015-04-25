@@ -1,5 +1,6 @@
-#!/usr/bin/env python
-
+"""
+Name: Kenley Arai
+"""
 """
 Closest_pair
 """
@@ -11,12 +12,6 @@ import random
 import bisect
 import csv
 
-def makeData(num):
-    points = []
-    for _ in xrange(num):
-        bisect.insort_right(points, (random.uniform(0,100), random.uniform(0,100)))
-    return points
-
 def file_input(filename):
     return csv.reader(open(filename), delimiter=" ")
 
@@ -24,12 +19,9 @@ def euclidean_dist(point_a, point_b):
     """
     Solves euclidean distance
     """
-    return round(sqrt((point_a[0] - point_b[0])**2 + (point_a[1] - point_b[1])**2), 5)
+    return round(sqrt((point_a[0] - point_b[0])**2 + (point_a[1] - point_b[1])**2), 100)
 
 def closest_pair_bf(points):
-    """
-    This is the brute force version of closest pair
-    """
     number_of_points = len(points)
     if number_of_points <= 1:
         return -1
@@ -40,9 +32,6 @@ def closest_pair_bf(points):
     return smallest
 
 def closest_pair_d_and_c(points):
-    """
-    This is the divide and conqour version of closest pair
-    """
     if len(points) < 4:
         return closest_pair_bf(points)
 
@@ -54,37 +43,24 @@ def closest_pair_d_and_c(points):
 
     smallest = min(smallest_left, smallest_right)
 
-    between_2_d = closest_pair_bf([item for item in points if \
-                  item[0] > mid_x - smallest and item[0] < mid_x + smallest])
+    between_2_d = sorted([item for item in points if \
+                        mid_x - smallest < item[0] < mid_x + smallest], key=lambda x: x[1])
 
-    if between_2_d == -1:
-        return smallest
-    return min(smallest, between_2_d)
+    y_smallest = smallest
+    for i in range(len(between_2_d) - 1):
+        if(between_2_d[i+1][1] - between_2_d[i][1] < y_smallest):
+            y_smallest = euclidean_dist(between_2_d[i], between_2_d[i+1])
 
-
-def graph(points):
-    print "#>title,Closest Point"
-    print "#>xAxis,Number of Points"
-    print "#>yAxis,Time in Seconds"
-    for i in xrange(0,len(points), 10):
-        time1 = time.time()
-        result1 = closest_pair_bf(points[:i])
-        time2 = time.time()
-        print "#>BruteForce,",len(points[:i]),",",time2-time1
-        time3 = time.time()
-        result2 = closest_pair_d_and_c(points[:i])
-        time4 = time.time()
-        print "#>DivideAndConquer,",len(points[:i]),",",time4-time3
-        sys.stdout.flush() #Needed to make graph update in real time
-
+    return min(y_smallest, smallest)
 
 def main(argv):
     file_points = file_input(argv[0])
     points = []
     for point in file_points:
-        bisect.insort_right(points, (float(point[0]), float(point[1])))
-    #graph(points)
-    print closest_pair_bf(points)
+        points += [(float(point[0]), float(point[1]))]
+    points = sorted(points, key=lambda x: x[0])
+    with open(argv[0].split(".")[0] + "_result.txt",'w') as f:
+        f.write(str(closest_pair_d_and_c(points)) + '\n')
 
 if __name__ == "__main__":
     main(sys.argv[1:])

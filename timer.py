@@ -26,6 +26,7 @@ def drawKey(key):
     pairs = sorted(graphVals[key], key = itemgetter(0))
     xVals = [pair[0] for pair in pairs]
     yVals = [pair[1] for pair in pairs]
+    fit = np.polyfit(xVals, yVals, 1)
     if key in graphLines:
         graphLines[key].set_xdata(xVals)
         graphLines[key].set_ydata(yVals)
